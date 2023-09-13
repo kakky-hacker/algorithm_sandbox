@@ -18,12 +18,14 @@ def calc_gain(input_y, output_y_left, output_y_right) -> float:
     return input_gini_impurity - output_gini_impurity
 
 
-def calc_best_split_feature(x, y):
+def calc_best_split_feature(x, y, feature_mask=None):
     num_of_features = x.shape[1]
     max_gain = -1
     max_gain_feature_index = -1
     max_gain_threshold = -1
-    for feature_index in range(num_of_features): 
+    for feature_index in range(num_of_features):
+        if feature_mask is not None and feature_mask[feature_index]:
+            continue
         feature_values = x[:, feature_index]
         feature_values_unique = np.unique(feature_values)
         for feature_value_threshold in feature_values_unique:
@@ -38,14 +40,14 @@ def calc_best_split_feature(x, y):
         
 
 class Node:
-    def __init__(self, x, y, num_of_class, max_depth, current_depth):
+    def __init__(self, x, y, num_of_class, max_depth, current_depth, feature_mask=None):
 
         self.prob = [np.count_nonzero(y == i) / len(y) for i in range(num_of_class)]
 
         if current_depth <= max_depth:
             self.is_leaf = False
 
-            self.gain, self.split_feature_index, self.split_threshold = calc_best_split_feature(x, y)
+            self.gain, self.split_feature_index, self.split_threshold = calc_best_split_feature(x, y, feature_mask=feature_mask)
 
             feature_values = x[:, self.split_feature_index]
             x_left = x[feature_values <= self.split_threshold]
@@ -61,6 +63,13 @@ class Node:
         else:
             self.is_leaf = True
 
+    def feature_importance(self, importance_value):
+        if not self.is_leaf:
+            importance_value[self.split_feature_index] += self.gain
+            self.left_node.feature_importance(importance_value)
+            self.right_node.feature_importance(importance_value)
+        return importance_value
+
     def output(self, x):
         if self.is_leaf:
             return self.prob
@@ -71,17 +80,21 @@ class Node:
             else:
                 return self.right_node.output(x)
 
+
 class Tree:
     def __init__(self, num_of_class, max_depth=5):
         self.num_of_class = num_of_class
         self.max_depth = max_depth
         self.root_node = None
+        self.feature_importance = None
 
-    def fit(self, x, y):
-        self.root_node = Node(x, y, self.num_of_class, self.max_depth, 1)
+    def fit(self, x, y, feature_mask=None):
+        self.root_node = Node(x, y, self.num_of_class, self.max_depth, 1, feature_mask=feature_mask)
+        self.feature_importance = self.root_node.feature_importance(np.array([0.] * x.shape[1]))
 
     def predict_proba(self, x):
         return [self.root_node.output(values) for values in x]
     
     def predict(self, x):
         return [np.argmax(self.root_node.output(values)) for values in x]
+    

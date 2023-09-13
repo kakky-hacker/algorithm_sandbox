@@ -2,6 +2,7 @@ from unittest import TestCase
 import numpy as np
 
 from core import *
+from random_forest import *
 
 class test_calc_gini_score(TestCase):
     def test1(self):
@@ -80,3 +81,5 @@ class test_Tree(TestCase):
         tree.fit(x, y)
         assert tree.predict_proba([[0, 2]]) == [[1.0, 0.0]]
         assert tree.predict_proba([[1, 4]]) == [[0.0, 1.0]]
+        assert all(tree.feature_importance == [0.0, 0.5])
+
