@@ -1,8 +1,9 @@
 from unittest import TestCase
-import numpy as np
 
+import numpy as np
 from core import *
 from random_forest import *
+
 
 class test_calc_gini_score(TestCase):
     def test1(self):
@@ -29,6 +30,7 @@ class test_calc_gini_score(TestCase):
         y = [1]
         assert calc_gini_score(y) == 0
 
+
 class test_calc_gain(TestCase):
     def test1(self):
         input_y = [0, 1, 0, 1]
@@ -54,6 +56,7 @@ class test_calc_gain(TestCase):
         output_y_right = [1, 1, 3, 3]
         assert calc_gain(input_y, output_y_left, output_y_right) == 0.25
 
+
 class test_calc_best_split_feature(TestCase):
     def test1(self):
         x = np.array([[0, 1], [0, 2], [1, 3], [1, 4]])
@@ -65,6 +68,7 @@ class test_calc_best_split_feature(TestCase):
         y = np.array([0, 0, 1, 1])
         assert calc_best_split_feature(x, y) == (0.5, 1, 2)
 
+
 class test_Node(TestCase):
     def test1(self):
         x = np.array([[0, 1], [0, 2], [0, 3], [1, 4]])
@@ -72,6 +76,7 @@ class test_Node(TestCase):
         node = Node(x, y, num_of_class=2, max_depth=1, current_depth=1)
         assert node.output([0, 2]) == [1.0, 0.0]
         assert node.output([1, 4]) == [0.0, 1.0]
+
 
 class test_Tree(TestCase):
     def test1(self):
@@ -82,4 +87,3 @@ class test_Tree(TestCase):
         assert tree.predict_proba([[0, 2]]) == [[1.0, 0.0]]
         assert tree.predict_proba([[1, 4]]) == [[0.0, 1.0]]
         assert all(tree.feature_importance == [0.0, 0.5])
-

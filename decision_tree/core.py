@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def calc_gini_score(y) -> float:
     if len(y) == 0:
         return 0
@@ -13,8 +14,9 @@ def calc_gini_score(y) -> float:
 def calc_gain(input_y, output_y_left, output_y_right) -> float:
     assert len(input_y) == (len(output_y_left) + len(output_y_right))
     input_gini_impurity = calc_gini_score(input_y)
-    output_gini_impurity = (calc_gini_score(output_y_left) * (len(output_y_left) / len(input_y)) + 
-                            calc_gini_score(output_y_right) * (len(output_y_right) / len(input_y)))
+    output_gini_impurity = calc_gini_score(output_y_left) * (
+        len(output_y_left) / len(input_y)
+    ) + calc_gini_score(output_y_right) * (len(output_y_right) / len(input_y))
     return input_gini_impurity - output_gini_impurity
 
 
@@ -37,17 +39,20 @@ def calc_best_split_feature(x, y, feature_mask=None):
                 max_gain_feature_index = feature_index
                 max_gain_threshold = feature_value_threshold
     return max_gain, max_gain_feature_index, max_gain_threshold
-        
+
 
 class Node:
     def __init__(self, x, y, num_of_class, max_depth, current_depth, feature_mask=None):
-
         self.prob = [np.count_nonzero(y == i) / len(y) for i in range(num_of_class)]
 
         if current_depth <= max_depth:
             self.is_leaf = False
 
-            self.gain, self.split_feature_index, self.split_threshold = calc_best_split_feature(x, y, feature_mask=feature_mask)
+            (
+                self.gain,
+                self.split_feature_index,
+                self.split_threshold,
+            ) = calc_best_split_feature(x, y, feature_mask=feature_mask)
 
             feature_values = x[:, self.split_feature_index]
             x_left = x[feature_values <= self.split_threshold]
@@ -58,8 +63,12 @@ class Node:
             if len(y_left) == 0 or len(y_right) == 0:
                 self.is_leaf = True
             else:
-                self.left_node = Node(x_left, y_left, num_of_class, max_depth, current_depth + 1)
-                self.right_node = Node(x_right, y_right, num_of_class, max_depth, current_depth + 1)
+                self.left_node = Node(
+                    x_left, y_left, num_of_class, max_depth, current_depth + 1
+                )
+                self.right_node = Node(
+                    x_right, y_right, num_of_class, max_depth, current_depth + 1
+                )
         else:
             self.is_leaf = True
 
@@ -89,12 +98,15 @@ class Tree:
         self.feature_importance = None
 
     def fit(self, x, y, feature_mask=None):
-        self.root_node = Node(x, y, self.num_of_class, self.max_depth, 1, feature_mask=feature_mask)
-        self.feature_importance = self.root_node.feature_importance(np.array([0.] * x.shape[1]))
+        self.root_node = Node(
+            x, y, self.num_of_class, self.max_depth, 1, feature_mask=feature_mask
+        )
+        self.feature_importance = self.root_node.feature_importance(
+            np.array([0.0] * x.shape[1])
+        )
 
     def predict_proba(self, x):
         return [self.root_node.output(values) for values in x]
-    
+
     def predict(self, x):
         return [np.argmax(self.root_node.output(values)) for values in x]
-    
