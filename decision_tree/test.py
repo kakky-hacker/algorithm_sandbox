@@ -106,6 +106,26 @@ class test_create_shadow_features(TestCase):
         assert all(features.sum(axis=0) == shadow_features.sum(axis=0))
 
 
+class test_calc_hit_feature(TestCase):
+    def test1(self):
+        original_feature_importance = np.array([2, 0, 3, 8, 1])
+        shadow_feature_importance = np.array([1, 0, 1, 0, 0])
+        hit_feature = calc_hit_feature(
+            original_feature_importance, shadow_feature_importance
+        )
+        assert all(hit_feature == np.array([1, 0, 1, 1, 0]))
+
+
+class test_calc_num_of_hit_per_feature(TestCase):
+    def test1(self):
+        original_feature_importances = np.array([[2, 0, 3, 8, 1], [4, 1, 5, 7, 2]])
+        shadow_feature_importances = np.array([[1, 0, 1, 0, 0], [1, 0, 2, 1, 0]])
+        num_of_hit_per_feature = calc_num_of_hit_per_feature(
+            original_feature_importances, shadow_feature_importances
+        )
+        assert all(num_of_hit_per_feature == np.array([2, 0, 2, 2, 0]))
+
+
 class test_RandomForest(TestCase):
     def test1(self):
         pass
