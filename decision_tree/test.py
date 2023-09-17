@@ -87,3 +87,25 @@ class test_Tree(TestCase):
         assert tree.predict_proba([[0, 2]]) == [[1.0, 0.0]]
         assert tree.predict_proba([[1, 4]]) == [[0.0, 1.0]]
         assert all(tree.feature_importance == [0.0, 0.5])
+
+
+class test_create_mask(TestCase):
+    def test1(self):
+        mask = create_mask(mask_length=10, max_num_of_zero_values=4)
+        assert len(mask) == 10
+        assert sum(mask) == 6
+
+
+class test_create_shadow_features(TestCase):
+    def test1(self):
+        features = np.array(
+            [[3, 5, 7, 11], [6, 10, 14, 22], [9, 15, 21, 33]], dtype=np.float32
+        )
+        shadow_features = create_shadow_features(features=features)
+        assert features.shape == shadow_features.shape
+        assert all(features.sum(axis=0) == shadow_features.sum(axis=0))
+
+
+class test_RandomForest(TestCase):
+    def test1(self):
+        pass
