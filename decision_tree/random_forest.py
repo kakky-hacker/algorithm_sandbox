@@ -106,4 +106,10 @@ class RandomForest:
         return [calc_ttest_bin(0.5, 100, num_hit) < 0.05 for num_hit in hit_per_feature]
 
     def predict(self, x):
-        return np.argmax([tree.predict(x) for tree in self.trees], axis=1)
+        preds = np.array([tree.predict(x) for tree in self.trees])
+        res = []
+        for i in range(len(x)):
+            unique, freq = np.unique(preds[:, i], return_counts=True)
+            md = unique[np.argmax(freq)]
+            res.append(md)
+        return res

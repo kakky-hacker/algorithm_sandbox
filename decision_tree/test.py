@@ -1,6 +1,11 @@
+import warnings
+
+warnings.simplefilter("ignore")
+
 from unittest import TestCase
 
 import numpy as np
+import pandas as pd
 from core import *
 from random_forest import *
 
@@ -133,11 +138,31 @@ class test_calc_ttest_bin(TestCase):
 
 class test_RandomForest(TestCase):
     def test_fit(self):
-        x = np.array([[0, 1], [0, 2], [1, 3], [1, 4]])
-        y = np.array([0, 0, 1, 1])
-        rf = RandomForest(2, 2, n_estimators=1, max_depth=1)
-        rf.fit(x, y)
-        assert all(rf.feature_importance == [0.5, 0.0])
+        train = pd.read_csv("data/titanic/train.csv")
 
-    def test_boruta(self):
-        pass
+        train["Age"] = train["Age"].fillna(train["Age"].median())
+        train["Embarked"] = train["Embarked"].fillna("S")
+        train.loc[train["Sex"] == "male", "Sex"] = 0
+        train.loc[train["Sex"] == "female", "Sex"] = 1
+        train.loc[train["Embarked"] == "S", "Embarked"] = 0
+        train.loc[train["Embarked"] == "C", "Embarked"] = 1
+        train.loc[train["Embarked"] == "Q", "Embarked"] = 2
+
+        train_x = train[
+            ["Pclass", "Age", "Sex", "Fare", "SibSp", "Parch", "Embarked"]
+        ].values[: int(len(train) * 0.8)]
+        train_y = train["Survived"].values[: int(len(train) * 0.8)]
+        test_x = train[
+            ["Pclass", "Age", "Sex", "Fare", "SibSp", "Parch", "Embarked"]
+        ].values[int(len(train) * 0.8) :]
+        test_y = train["Survived"].values[int(len(train) * 0.8) :]
+
+        model = RandomForest(
+            num_of_class=2, max_features=4, max_depth=5, n_estimators=5
+        )
+        model.fit(train_x, train_y)
+
+        pred_y = model.predict(test_x)
+        accuracy = sum([a == b for a, b in zip(pred_y, test_y)]) / len(test_y)
+        print(pred_y, accuracy)
+        assert accuracy > 0.86
