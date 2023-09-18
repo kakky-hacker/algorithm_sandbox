@@ -1,3 +1,4 @@
+import math
 from random import randint
 
 import numpy as np
@@ -41,6 +42,17 @@ def calc_num_of_hit_per_feature(
     )
 
 
+def comb(n, r):
+    return math.factorial(n) // (math.factorial(n - r) * math.factorial(r))
+
+
+def calc_ttest_bin(p, n, k):
+    p_value = 0
+    for i in range(k, n + 1):
+        p_value += comb(n, i) * (p**i) * ((1 - p) ** (n - i))
+    return p_value
+
+
 class RandomForest:
     def __init__(self, num_of_class, max_features, n_estimators=100, max_depth=5):
         self.num_of_class = num_of_class
@@ -68,23 +80,30 @@ class RandomForest:
         )
 
     def fit_with_boruta(self, x, y):
-        num_of_features = x.shape[1] * 2
+        num_of_features = x.shape[1]
         feature_importances = np.array(
-            [[] for _ in range(num_of_features)]
+            [[] for _ in range(num_of_features * 2)]
         )  # shape(num_of_features, 100)
         for _ in range(100):
             self.fit(np.concatenate([x, create_shadow_features(x)], axis=1), y)
             feature_importances = np.concatenate(
                 [
                     feature_importances,
-                    self.feature_importance.reshape(num_of_features, 1),
+                    self.feature_importance.reshape(num_of_features * 2, 1),
                 ],
                 axis=1,
             )
+        original_feature_importances = feature_importances[
+            : len(feature_importances) // 2
+        ]
+        shadow_feature_importances = feature_importances[
+            len(feature_importances) // 2 :
+        ]
         hit_per_feature = calc_num_of_hit_per_feature(
-            feature_importances[: len(feature_importances) // 2],
-            feature_importances[len(feature_importances) // 2 :],
-        )  # shape(num_of_features, 1)
+            original_feature_importances.reshape(100, num_of_features),
+            shadow_feature_importances.reshape(100, num_of_features),
+        )  # shape(num_of_features // 2)
+        return [calc_ttest_bin(0.5, 100, num_hit) < 0.05 for num_hit in hit_per_feature]
 
     def predict(self, x):
         return np.argmax([tree.predict(x) for tree in self.trees], axis=1)

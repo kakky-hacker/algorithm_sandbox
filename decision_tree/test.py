@@ -126,6 +126,18 @@ class test_calc_num_of_hit_per_feature(TestCase):
         assert all(num_of_hit_per_feature == np.array([2, 0, 2, 2, 0]))
 
 
-class test_RandomForest(TestCase):
+class test_calc_ttest_bin(TestCase):
     def test1(self):
+        assert 0.184 < calc_ttest_bin(0.5, 100, 55) < 0.185
+
+
+class test_RandomForest(TestCase):
+    def test_fit(self):
+        x = np.array([[0, 1], [0, 2], [1, 3], [1, 4]])
+        y = np.array([0, 0, 1, 1])
+        rf = RandomForest(2, 2, n_estimators=1, max_depth=1)
+        rf.fit(x, y)
+        assert all(rf.feature_importance == [0.5, 0.0])
+
+    def test_boruta(self):
         pass
