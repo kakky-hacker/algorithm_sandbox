@@ -1,0 +1,5 @@
+#output 17.375
+hoge = 7
+huga = 4
+piyo = 12
+print ((hoge + (7*2 - 3) / 4) / 2 - (huga * piyo / 3 - 8) + 6)*(2+3) + 5 - 2
