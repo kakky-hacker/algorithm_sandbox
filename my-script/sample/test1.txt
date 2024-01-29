@@ -1,5 +1,0 @@
-# output 12
-a = 3
-b = 8
-c = 2
-print ((a + b) * c + 4) / 2 - 1

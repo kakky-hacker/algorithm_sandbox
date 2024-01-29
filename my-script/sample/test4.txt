@@ -1,7 +1,0 @@
-# output 0.0, 0.93548387096, 3.5
-hoge = 23.4
-piyo = 78.6
-res = hoge * (piyo - 6) < 100
-print res
-print ((res * 3) + 2.9) / 3.1
-print (hoge*2 < piyo) * 4.5 - 1
