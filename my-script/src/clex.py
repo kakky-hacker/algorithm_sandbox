@@ -16,10 +16,6 @@ tokens = (
     "RPAREN",
     "AND",
     "OR",
-    "NOT",
-    "IF",
-    "ELIF",
-    "ELSE",
 )
 
 t_ignore = " \t"
@@ -44,26 +40,6 @@ def t_AND(t):
 
 def t_OR(t):
     r"or"
-    return t
-
-
-def t_NOT(t):
-    r"not"
-    return t
-
-
-def t_IF(t):
-    r"if"
-    return t
-
-
-def t_ELIF(t):
-    r"elif"
-    return t
-
-
-def t_ELSE(t):
-    r"else"
     return t
 
 
