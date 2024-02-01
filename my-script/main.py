@@ -2,11 +2,12 @@ from src.cyacc import parse
 
 
 def main():
-    with open("sample/code.txt", "r") as f:
-        code = f.read()
-        for data in code.split("\n"):
-            if data != "":
-                parse(data)
+    while True:
+        print(">>", end=" ")
+        code = input()
+        if code == "exit":
+            break
+        parse(code)
 
 
 if __name__ == "__main__":
