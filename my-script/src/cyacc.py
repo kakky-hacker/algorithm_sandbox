@@ -37,7 +37,7 @@ def p_statement_assign(p):
 
 def p_statement_expr(p):
     "statement : expression"
-    print(p[1])
+    print(">> " + str(p[1]))
 
 
 def p_expression_comparison(p):
