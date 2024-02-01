@@ -2,11 +2,11 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.font import Font
 
-from cyacc import parse
+from src.cyacc import parse
 
 
 def run():
-    print("====restart====")
+    print("-------restart-------")
     code = txt.get("1.0", "end").split("\n")
     for data in code:
         if data != "":
