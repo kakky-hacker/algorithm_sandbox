@@ -7,14 +7,22 @@ from individual import Individual
 def one_point():
     def one_point_func_core(population: List[Individual], objective_func, n_children):
         children = []
-        for _ in range(n_children):
+        for _ in range(max(n_children // 2, 1)):
             parent1, parent2 = random.sample(population, 2)
             idx = random.randint(0, len(parent1.chromosome) - 1)
-            child_chromosome = parent1.chromosome[:idx] + parent2.chromosome[idx:]
+            child_chromosome1 = parent1.chromosome[:idx] + parent2.chromosome[idx:]
+            child_chromosome2 = parent2.chromosome[:idx] + parent1.chromosome[idx:]
             children.append(
                 Individual(
-                    child_chromosome,
-                    objective_func(child_chromosome),
+                    child_chromosome1,
+                    objective_func(child_chromosome1),
+                    parent1.direction,
+                )
+            )
+            children.append(
+                Individual(
+                    child_chromosome2,
+                    objective_func(child_chromosome1),
                     parent1.direction,
                 )
             )
@@ -24,4 +32,38 @@ def one_point():
 
 
 def two_points():
-    pass
+    def two_points_func_core(population: List[Individual], objective_func, n_children):
+        children = []
+        for _ in range(max(n_children // 2, 1)):
+            parent1, parent2 = random.sample(population, 2)
+            idx1 = random.randint(0, len(parent1.chromosome) - 1)
+            idx2 = random.randint(0, len(parent1.chromosome) - 1)
+            if idx2 < idx1:
+                idx1, idx2 = idx2, idx1
+            child_chromosome1 = (
+                parent1.chromosome[:idx1]
+                + parent2.chromosome[idx1:idx2]
+                + parent1[idx2:]
+            )
+            child_chromosome2 = (
+                parent2.chromosome[:idx1]
+                + parent1.chromosome[idx1:idx2]
+                + parent2.chromosome[idx2:]
+            )
+            children.append(
+                Individual(
+                    child_chromosome1,
+                    objective_func(child_chromosome1),
+                    parent1.direction,
+                )
+            )
+            children.append(
+                Individual(
+                    child_chromosome2,
+                    objective_func(child_chromosome1),
+                    parent1.direction,
+                )
+            )
+        return children
+
+    return two_points_func_core
