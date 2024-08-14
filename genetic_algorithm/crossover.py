@@ -67,3 +67,37 @@ def two_points():
         return children
 
     return two_points_func_core
+
+
+def uniform_crossover(mask: List[bool]):
+    def uniform_crossover_core(
+        population: List[Individual], objective_func, n_children
+    ):
+        children = []
+        for _ in range(max(n_children // 2, 1)):
+            parent1, parent2 = random.sample(population, 2)
+            child_chromosome1 = [
+                parent2.chromosome[i] if mask[i] else parent1.chromosome[i]
+                for i in range(len(parent1.chromosome))
+            ]
+            child_chromosome2 = [
+                parent1.chromosome[i] if mask[i] else parent2.chromosome[i]
+                for i in range(len(parent1.chromosome))
+            ]
+            children.append(
+                Individual(
+                    child_chromosome1,
+                    objective_func(child_chromosome1),
+                    parent1.direction,
+                )
+            )
+            children.append(
+                Individual(
+                    child_chromosome2,
+                    objective_func(child_chromosome1),
+                    parent1.direction,
+                )
+            )
+        return children
+
+    return uniform_crossover_core
