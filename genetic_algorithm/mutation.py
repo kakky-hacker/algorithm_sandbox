@@ -13,6 +13,5 @@ def random_int(a: int, b: int, p1: float, p2: float):
                 if p2 <= random.random():
                     continue
                 individual.chromosome[i] = random.randint(a, b)
-        return population
 
     return random_int_core

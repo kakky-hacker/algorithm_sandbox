@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 from typing import List
 
 from individual import Individual
@@ -10,8 +11,12 @@ def one_point():
         for _ in range(max(n_children // 2, 1)):
             parent1, parent2 = random.sample(population, 2)
             idx = random.randint(0, len(parent1.chromosome) - 1)
-            child_chromosome1 = parent1.chromosome[:idx] + parent2.chromosome[idx:]
-            child_chromosome2 = parent2.chromosome[:idx] + parent1.chromosome[idx:]
+            child_chromosome1 = deepcopy(
+                parent1.chromosome[:idx] + parent2.chromosome[idx:]
+            )
+            child_chromosome2 = deepcopy(
+                parent2.chromosome[:idx] + parent1.chromosome[idx:]
+            )
             children.append(
                 Individual(
                     child_chromosome1,
@@ -40,12 +45,12 @@ def two_points():
             idx2 = random.randint(0, len(parent1.chromosome) - 1)
             if idx2 < idx1:
                 idx1, idx2 = idx2, idx1
-            child_chromosome1 = (
+            child_chromosome1 = deepcopy(
                 parent1.chromosome[:idx1]
                 + parent2.chromosome[idx1:idx2]
                 + parent1[idx2:]
             )
-            child_chromosome2 = (
+            child_chromosome2 = deepcopy(
                 parent2.chromosome[:idx1]
                 + parent1.chromosome[idx1:idx2]
                 + parent2.chromosome[idx2:]
@@ -76,14 +81,18 @@ def uniform_crossover(mask: List[bool]):
         children = []
         for _ in range(max(n_children // 2, 1)):
             parent1, parent2 = random.sample(population, 2)
-            child_chromosome1 = [
-                parent2.chromosome[i] if mask[i] else parent1.chromosome[i]
-                for i in range(len(parent1.chromosome))
-            ]
-            child_chromosome2 = [
-                parent1.chromosome[i] if mask[i] else parent2.chromosome[i]
-                for i in range(len(parent1.chromosome))
-            ]
+            child_chromosome1 = deepcopy(
+                [
+                    parent2.chromosome[i] if mask[i] else parent1.chromosome[i]
+                    for i in range(len(parent1.chromosome))
+                ]
+            )
+            child_chromosome2 = deepcopy(
+                [
+                    parent1.chromosome[i] if mask[i] else parent2.chromosome[i]
+                    for i in range(len(parent1.chromosome))
+                ]
+            )
             children.append(
                 Individual(
                     child_chromosome1,
